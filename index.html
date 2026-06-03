@@ -1,85 +1,18 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>MiKey Log System</title>
-    <style>
-        body { background-color: #1a1a1a; color: #d4af37; font-family: sans-serif; padding: 30px; line-height: 1.6; }
-        .container { max-width: 600px; margin: auto; border: 2px solid #d4af37; padding: 20px; border-radius: 15px; background: #2d2d2d; box-shadow: 0 0 20px rgba(212,175,55,0.3); }
-        h1 { border-bottom: 2px solid #d4af37; padding-bottom: 10px; text-align: center; }
-        .feature { background: rgba(255,255,255,0.05); padding: 10px; margin: 10px 0; border-left: 4px solid #4caf50; }
-        
-        /* 読み上げコントロール用のボタン群スタイル */
-        .audio-ctrl { text-align: center; margin: 15px 0; }
-        .btn { background: #4caf50; color: white; border: none; padding: 10px 20px; font-size: 1em; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 5px; }
-        .btn-stop { background: #f44336; }
-        .guide-msg { color: #fff; text-align: center; font-size: 0.9em; background: #333; padding: 8px; border-radius: 5px; margin-bottom: 15px; border: 1px dashed #d4af37; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🗝️ MiKey Log System</h1>
-        <p style="text-align:center; font-style:italic;">〜 マイキーログの使い方 〜</p>
-        
-        <div class="guide-msg">🔊 画面のどこかをタップするか、下のボタンを押すと自動読み上げが始まります。</div>
-        <div class="audio-ctrl">
-            <button class="btn" onclick="startSpeech()">▶ 音声を再生</button>
-            <button class="btn btn-stop" onclick="stopSpeech()">■ 停止</button>
-        </div>
-
-        <div id="speech-target">
-            <div class="feature">
-                <strong>①QRコードをスキャンしよう！</strong><br>
-                キーボックス付近にあるPCに繋がれたQRコードリーダーに、事前に配布されたQRコードをかざして下さい。<img src="images/B.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-                （ヘルメットに貼り付けておくと便利です）<img src="images/A.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-            </div>
-
-            <div class="feature">
-                <strong>②PCに表示されている画面を確認して下さい。</strong><br>
-                正常なら画面が緑色、異常なら赤色に変化します。<img src="images/C.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-                画面が緑色になったら、キーボックスからカチッと音が鳴り、開錠のLEDが緑色になります。<img src="images/D.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-                そうしたらキーボックスの鍵が外れますので、ツマミを持って扉を開き15秒以内に乗車したい番号の鍵が刺さっているピンを抜いて、手を放し扉を閉めて下さい。<img src="images/E.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-                もし扉が閉まりきらなかった場合は半ドアの赤色LEDが点滅しますので、<img src="images/F.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-                再度QRコードスキャンして開錠して再チャレンジしてみて下さい。<br>
-                画面が赤色になったり、警告音が鳴った場合には、QRコードを貸与された管理者へ御連絡下さい。
-            </div> 
-
-            <div class="feature">
-                <strong>③鍵の取り出し方</strong><br>
-                乗車したい番号のキーホルダーが付いたピンを、上へ引き抜く感じで取り出して下さい。<img src="images/G1.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-                
-                <img src="images/G2.png" alt="①QRコード" style="max-width:60%; display:block; margin:45px auto; transform: rotate(90deg);">
-                
-                <img src="images/G3.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-                
-                <img src="images/G4.png" alt="①QRコード" style="max-width:60%; display:block; margin:45px auto; transform: rotate(90deg);">
-            </div>
-
-            <div class="feature">
-                <strong>④鍵の返却</strong><br>
-                開錠時同様にQRコードを読み取り開錠して、ピンを借りた時と同じ場所へカチッとなるまで差し込んで下さい。<br>
-                15秒以内に鍵を戻し、扉から手を放し閉めて下さい。<br>
-                時間内に戻せなかったら、再度QRコードを読み取る所からチャレンジしてみて下さい。<br>
-                鍵を返却し扉を閉めて、鍵と同じ番号のLEDが緑色に点灯すれば、完了です。<img src="images/I.png" alt="①QRコード" style="width:100%; margin:10px 0;">
-                それ以外の反応見受けられた場合は、管理者へお問い合わせ下さい。<br>
-                尚、定められた時間内に鍵の返却が無かった場合は、該当番号の確認ランプが点滅し、確認者が声掛けを致します。
-            </div>
-        </div>
-        
-        <p style="margin-top:20px; font-size:0.8em; text-align:center;"> モノづくり工房</p>
-    </div>
-
     <script>
         let synth = window.speechSynthesis;
         let isSpeaking = false;
+        
+        // BGM用のオーディオオブジェクトを作成
+        // ※「bgm.mp3」の部分を、実際の音楽ファイルのパスに書き換えてください
+        const bgm = new Audio('bgm.mp3');
+        bgm.loop = true;     // ループ再生を有効に
+        bgm.volume = 0.15;   // 音量調整（0.0 〜 1.0）。読み上げを邪魔しないよう小さめ（15%）に設定
 
         // 読み上げたいテキストをページ内から自動抽出して整える関数
         function getSpeechText() {
             const target = document.getElementById('speech-target');
-            // 画像タグのalt属性などを除外するため、プレーンなテキストを取得
             let text = target.innerText;
             
-            // 読み上げのニュアンスを自然にするための微調整
             text = text.replace(/①/g, '、まるいち、')
                        .replace(/②/g, '、まるに、')
                        .replace(/③/g, '、まるさん、')
@@ -96,32 +29,45 @@
                 synth.cancel(); // 既に喋っていたら一旦止める
             }
             
+            // BGMも一旦停止して最初から再生
+            bgm.pause();
+            bgm.currentTime = 0;
+
             const text = getSpeechText();
             const utterance = new SpeechSynthesisUtterance(text);
             
             utterance.lang = 'ja-JP';   // 日本語に設定
-            utterance.rate = 1.0;       // 読み上げ速度（1.0が標準。0.9で少しゆっくりにできます）
+            utterance.rate = 1.0;       // 読み上げ速度
             utterance.pitch = 1.0;      // 声の高さ
 
+            // 読み上げが終了した時のイベント
+            utterance.onend = function() {
+                stopSpeech(); // 読み上げが終わったらBGMも止める
+            };
+
+            // 読み上げ中にエラーが起きた場合も停止処理
+            utterance.onerror = function() {
+                stopSpeech();
+            };
+
+            // BGMの再生を開始し、同時に読み上げをスタート
+            bgm.play().catch(e => console.log("BGM再生エラー:", e));
             synth.speak(utterance);
             isSpeaking = true;
         }
 
-        // 読み上げ停止
+        // 読み上げとBGMの停止
         function stopSpeech() {
             synth.cancel();
+            bgm.pause();
+            bgm.currentTime = 0; // 曲を先頭に戻す
             isSpeaking = false;
         }
 
         // 【超重要】スマホのセキュリティ対策
-        // iPhoneやAndroidは「画面を一切触っていない状態での完全自動音出し」をブロックします。
-        // そのため、ユーザーが画面のどこかを1回タップした瞬間に流れ出すようにしています。
         document.body.addEventListener('click', (e) => {
-            // ボタン自体をクリックした時は重複させない
             if (e.target.tagName !== 'BUTTON' && !isSpeaking) {
                 startSpeech();
             }
         });
     </script>
-</body>
-</html>
